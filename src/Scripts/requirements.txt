@@ -1,0 +1,2 @@
+# Python dependencies for TopoRTL
+# Add dependencies as needed, for now using only standard library

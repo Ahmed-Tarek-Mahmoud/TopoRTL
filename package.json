@@ -3,6 +3,7 @@
   "displayName": "TopoRTL",
   "description": "A VS Code extension that integrates RTL dependency resolution for SystemVerilog/Verilog projects.",
   "version": "0.0.1",
+  "publisher": "AhmedTarek",
   "repository": {
     "type": "git",
     "url": "https://github.com/Ahmed-Tarek-Mahmoud/TopoRTL.git"

@@ -13,7 +13,18 @@ A VS Code extension that integrates the RTL Dependency Resolver, allowing you to
 ## Requirements
 
 - VS Code 1.110.0 or later
-- The extension bundles its own Python environment, so no additional Python installation is required.
+- **Python 3.6 or later** must be installed and accessible from your system PATH
+
+### Platform-Specific Installation
+
+**Windows**: 
+1. Download Python 3.7+ from https://www.python.org/downloads/
+2. **Important**: During installation, check "Add Python to PATH"
+3. Restart VS Code after installation
+
+**macOS**: Python 3 is usually pre-installed. If needed: `brew install python3`
+
+**Linux**: Install via package manager (e.g., `sudo apt-get install python3` on Ubuntu)
 
 ## How to Use
 

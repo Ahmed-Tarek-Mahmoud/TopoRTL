@@ -1,8 +1,8 @@
 {
-  "name": "toportl",
-  "displayName": "TopoRTL",
+  "name": "topo-rtl",
+  "displayName": "Topo-RTL",
   "description": "A VS Code extension that integrates RTL dependency resolution for SystemVerilog/Verilog projects.",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "publisher": "AhmedTarek",
   "icon": "topoRTL.jpeg",
   "repository": {
@@ -17,6 +17,10 @@
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
+  "files": [
+    "out",
+    "src/Scripts"
+  ],
   "contributes": {
     "commands": [
       {

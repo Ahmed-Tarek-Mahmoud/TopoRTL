@@ -22,9 +22,8 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const extensionRoot = context.extensionPath;
+			const extensionRoot = context.extensionPath;
 		const scriptsDir = path.join(extensionRoot, 'src', 'Scripts');
-		const pythonEnvDir = path.join(extensionRoot, 'src', 'python_env');
 		const pythonScript = path.join(scriptsDir, 'main.py');
 
 		// Show open dialog to select RTL directory
@@ -39,17 +38,16 @@ export function activate(context: vscode.ExtensionContext) {
 		const rtlDir = uris[0].fsPath;
 		const outputFile = path.join(rtlDir, 'src_files.list');
 
-		await runWithBundledPython(output, scriptsDir, pythonEnvDir, pythonScript, rtlDir, outputFile);
+		await runWithUserPython(output, scriptsDir, pythonScript, rtlDir, outputFile);
 	});
 
 
 	context.subscriptions.push(sortDisposable);
 }
 
-async function runWithBundledPython(
+async function runWithUserPython(
 	output: vscode.OutputChannel,
 	scriptsDir: string,
-	pythonEnvDir: string,
 	pythonScript: string,
 	rtlDir: string,
 	outputFile: string
@@ -60,43 +58,37 @@ async function runWithBundledPython(
 		output.appendLine(`Output File: ${outputFile}`);
 		output.appendLine(`Platform: ${process.platform}`);
 
-		const isWindows = process.platform === 'win32';
 		let pythonExe: string;
 
-		if (isWindows) {
-			// Windows: Use bundled Python environment
-			output.appendLine(`Python Env Dir: ${pythonEnvDir}`);
-			
-			if (!fs.existsSync(pythonEnvDir)) {
-				vscode.window.showErrorMessage('Bundled Python environment not found. Please ensure python_env folder exists.');
-				return;
-			}
-
-			pythonExe = path.join(pythonEnvDir, 'Scripts\\python.exe');
-
-			if (!fs.existsSync(pythonExe)) {
-				vscode.window.showErrorMessage(`Python executable not found at ${pythonExe}`);
-				return;
-			}
-		} else {
-			// Linux/Mac: Use system Python
-			pythonExe = 'python3';
-			
+		// Try to find Python in the system PATH
+		try {
+			execSync('python --version', { stdio: 'pipe' });
+			pythonExe = 'python';
+		} catch {
 			try {
-				execSync(`${pythonExe} --version`, { stdio: 'pipe' });
+				execSync('python3 --version', { stdio: 'pipe' });
+				pythonExe = 'python3';
 			} catch {
-				pythonExe = 'python';
-				try {
-					execSync(`${pythonExe} --version`, { stdio: 'pipe' });
-				} catch {
-					vscode.window.showErrorMessage('Python is not installed. Please install Python 3.7+');
-					return;
-				}
+				const platformMsg = process.platform === 'win32' 
+					? 'Python is not installed. Please download and install Python 3.7+ from https://www.python.org/downloads/ and ensure it is added to your PATH.'
+					: 'Python is not installed. Please install Python 3.7+ (e.g., apt-get install python3 on Linux or brew install python3 on macOS).';
+				vscode.window.showErrorMessage(platformMsg);
+				output.appendLine(`ERROR: ${platformMsg}`);
+				return;
 			}
 		}
 
 		// Run the main Python script
-		output.appendLine(`Using Python from: ${pythonExe}`);
+		output.appendLine(`Using Python: ${pythonExe}`);
+		
+		// Verify the python executable can run
+		try {
+			const versionCheck = execSync(`"${pythonExe}" --version`, { encoding: 'utf-8' });
+			output.appendLine(`Python version: ${versionCheck.trim()}`);
+		} catch (e: any) {
+			output.appendLine(`WARNING: Could not verify Python version: ${e.message}`);
+		}
+
 		output.appendLine(`Running main.py...`);
 		try {
 			const result = execSync(
